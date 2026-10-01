@@ -11,7 +11,7 @@
 		</classes>
 	</test>
 	<test name="OrangeHRMTest_edge">
-		<parameter name="browser" value="edge" />
+		<parameter name="browser" value="chrome" />
 		<classes>
 			<class name="com.orangehrm.test.DummyClass" />
 			<class name="com.orangehrm.test.DummyClass2" />

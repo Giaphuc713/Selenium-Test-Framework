@@ -50,92 +50,95 @@ public class ExtentManager {
 		test.set(extentTest);
 		return extentTest;
 	}
-	
-	//End a Test
+
+	// End a Test
 	public synchronized static void endTest() {
 		getReporter().flush();
 	}
-	
-	//Get Current Thread's test
+
+	// Get Current Thread's test
 	public synchronized static ExtentTest getTest() {
 		return test.get();
 	}
-	
-	//Method to get the name of the current test
+
+	// Method to get the name of the current test
 	public static String getTestName() {
 		ExtentTest currentTest = getTest();
-		if(currentTest!=null) {
+		if (currentTest != null) {
 			return currentTest.getModel().getName();
-		}
-		else {
+		} else {
 			return "No test is currently active for this thread";
 		}
 	}
-	
-	//Log a step
+
+	// Log a step
 	public static void logStep(String logMessage) {
-		getTest().info(logMessage);
+		com.orangehrm.base.BaseClass.logger.info("[STEP] " + logMessage);
+		if (getTest() != null) {
+			getTest().info(logMessage);
+		}
 	}
-	
-	//Log a step validation with screenshot
+
+	// Log a step validation with screenshot
 	public static void logStepWithScreenshot(WebDriver driver, String logMessage, String screenShotMessage) {
 		getTest().pass(logMessage);
-		//Screenshot method
-		attachScreenshot(driver,screenShotMessage);
-		
+		// Screenshot method
+		attachScreenshot(driver, screenShotMessage);
+
 	}
-	
-	//Log a step validation for API
+
+	// Log a step validation for API
 	public static void logStepValidationForAPI(String logMessage) {
 		getTest().pass(logMessage);
 	}
-	
-	//Log a Failure
+
+	// Log a Failure
 	public static void logFailure(WebDriver driver, String logMessage, String screenShotMessage) {
 		String colorMessage = String.format("<span style='color:red;'>%s</span>", logMessage);
 		getTest().fail(colorMessage);
-		//Screenshot method
-		attachScreenshot(driver,screenShotMessage);
+		// Screenshot method
+		attachScreenshot(driver, screenShotMessage);
 	}
-	
-	//Log a Failure for API
+
+	// Log a Failure for API
 	public static void logFailureAPI(String logMessage) {
 		String colorMessage = String.format("<span style='color:red;'>%s</span>", logMessage);
 		getTest().fail(colorMessage);
 	}
-	
-	//Log a skip
+
+	// Log a skip
 	public static void logSkip(String logMessage) {
 		String colorMessage = String.format("<span style='color:orange;'>%s</span>", logMessage);
 		getTest().skip(colorMessage);
 	}
 
-	//Take a screenshot with date and time in the file
+	// Take a screenshot with date and time in the file
 	public synchronized static String takeScreenshot(WebDriver driver, String screenshotName) {
-        TakesScreenshot ts = (TakesScreenshot)driver;
-        File src = ts.getScreenshotAs(OutputType.FILE);
-        //Format date and Time for file name
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-        
-        //Saving the screenshot to a file
-        String destPath = System.getProperty("user.dir") + "/src/test/resources/screenshots/"+screenshotName+"_"+timeStamp+".png";
-        
-        File finalPath = new File(destPath);
-        try {
+		TakesScreenshot ts = (TakesScreenshot) driver;
+		File src = ts.getScreenshotAs(OutputType.FILE);
+		// Format date and Time for file name
+		String timeStamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+
+		// Saving the screenshot to a file
+		String destPath = System.getProperty("user.dir") + "/src/test/resources/screenshots/" + screenshotName + "_"
+				+ timeStamp + ".png";
+
+		File finalPath = new File(destPath);
+		try {
 			FileUtils.copyFile(src, finalPath);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-        //Convert screenshot to Base64 fir embedding in the Report
-        String base64Format = convertToBase64(src);
-        return base64Format;
+		// Convert screenshot to Base64 fir embedding in the Report
+		String base64Format = convertToBase64(src);
+		return base64Format;
 	}
-	
-	//Convert screenshot to Base64 format
+
+	// Convert screenshot to Base64 format
 	public static String convertToBase64(File screenShotFile) {
-		String base64Format="";
-		//Read the file content into a byte array
+		String base64Format = "";
+		// Read the file content into a byte array
 		try {
 			byte[] fileContent = FileUtils.readFileToByteArray(screenShotFile);
 			base64Format = Base64.getEncoder().encodeToString(fileContent);
@@ -145,18 +148,19 @@ public class ExtentManager {
 		}
 		return base64Format;
 	}
-	
-	//Attach screenshot to report using Base64
+
+	// Attach screenshot to report using Base64
 	public synchronized static void attachScreenshot(WebDriver driver, String message) {
 		try {
-			String screenShotBase64 = takeScreenshot(driver,getTestName());
-			getTest().info(message,com.aventstack.extentreports.MediaEntityBuilder.createScreenCaptureFromBase64String(screenShotBase64).build());
+			String screenShotBase64 = takeScreenshot(driver, getTestName());
+			getTest().info(message, com.aventstack.extentreports.MediaEntityBuilder
+					.createScreenCaptureFromBase64String(screenShotBase64).build());
 		} catch (Exception e) {
-			getTest().fail("Failed to attach screenshot:"+message);
+			getTest().fail("Failed to attach screenshot:" + message);
 			e.printStackTrace();
 		}
 	}
-	
+
 	// Register WebDriver for current Thread
 	public static void registerDriver(WebDriver driver) {
 		driverMap.put(Thread.currentThread().getId(), driver);

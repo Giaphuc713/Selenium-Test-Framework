@@ -9,18 +9,32 @@ import com.orangehrm.base.BaseClass;
 public class HomePage {
 
 	private ActionDriver actionDriver;
+	private AddAdminPage addAdminPage;
 
 	// Define locators using By class
 	private By adminTab = By.xpath("//span[text()='Admin']");
 	private By userIDButton = By.className("oxd-userdropdown-name");
 	private By logoutButton = By.xpath("//a[text()='Logout']");
 	private By oranageHRMlogo = By.xpath("//div[@class='oxd-brand-banner']//img");
-	
 	private By pimTab = By.xpath("//span[text()='PIM']");
-	private By employeeSearch = By.xpath("//label[text()='Employee Name']/parent::div/following-sibling::div/div/div/input");
+	private By employeeSearch = By
+			.xpath("//label[text()='Employee Name']/parent::div/following-sibling::div/div/div/input");
 	private By searchButton = By.xpath("//button[@type='submit']");
 	private By emplFirstAndMiddleName = By.xpath("//div[@class='oxd-table-card']/div/div[3]");
 	private By emplLastName = By.xpath("//div[@class='oxd-table-card']/div/div[4]");
+	private By closeSideBar = By.xpath("//i[@class='oxd-icon bi-chevron-left']");
+	private By openSideBar = By.xpath("//i[@classs ='oxd-icon bi-chevron-right']");
+	private By usernameInput = By.xpath("(//input[contains(@class,'oxd-input')])[2]");
+	private By employeenameInput = By.xpath("//input[contains(@placeholder,'Type for hints')]");
+	private By roleSelect = By.xpath("(//div[@class = 'oxd-select-wrapper'])[1]");
+	private By statusSelect = By.xpath("(//div[@class = 'oxd-select-wrapper'])[2]");
+	private By role_Admin = By.xpath("(//div[text()='Admin'])[1]");
+	private By status_Enabled = By.xpath("(//div[text()='Enabled'])[1]");
+	private By searchButton2 = By.xpath("//button[@type='submit']");
+	private By noRecordFouns = By.xpath("//span[text()='No Records Found']");
+	private By deleteAdminButton = By.xpath("//i[@class='oxd-icon bi-trash']");
+	private By confirmDelete = By.xpath("//button[text() = ' Yes, Delete ']");
+	private By addButton = By.xpath("//i[text() = ' Add ']");
 
 	// Initialize the ActionDriver object by passing WebDriver instance
 	/*
@@ -30,6 +44,7 @@ public class HomePage {
 
 	public HomePage(WebDriver driver) {
 		this.actionDriver = BaseClass.getActionDriver();
+		this.addAdminPage = new AddAdminPage();
 	}
 
 	// Method to verify if Admin tab is visible
@@ -40,27 +55,27 @@ public class HomePage {
 	public boolean verifyOrangeHRMlogo() {
 		return actionDriver.isDisplayed(oranageHRMlogo);
 	}
-	
-	//Method to Navigate to PIM tab
+
+	// Method to Navigate to PIM tab
 	public void clickOnPIMTab() {
 		actionDriver.click(pimTab);
 	}
-	
-	//Employee Search
+
+	// Employee Search
 	public void employeeSearch(String value) {
 		actionDriver.enterText(employeeSearch, value);
 		actionDriver.click(searchButton);
 		actionDriver.scrollToElement(emplFirstAndMiddleName);
 	}
-	
-	//Verify employee first and middle name
+
+	// Verify employee first and middle name
 	public boolean verifyEmployeeFirstAndMiddleName(String emplFirstAndMiddleNameFromDB) {
-		return  actionDriver.compareText(emplFirstAndMiddleName, emplFirstAndMiddleNameFromDB);
+		return actionDriver.compareText(emplFirstAndMiddleName, emplFirstAndMiddleNameFromDB);
 	}
-	
-	//Verify employee first and middle name
+
+	// Verify employee first and middle name
 	public boolean verifyEmployeeLastName(String emplLastFromDB) {
-		return  actionDriver.compareText(emplLastName, emplLastFromDB);
+		return actionDriver.compareText(emplLastName, emplLastFromDB);
 	}
 
 	// Method to perform logout operation
@@ -68,4 +83,46 @@ public class HomePage {
 		actionDriver.click(userIDButton);
 		actionDriver.click(logoutButton);
 	}
+
+	public void openSidebar() {
+		actionDriver.click(openSideBar);
+	}
+
+	public void closeSidebar() {
+		actionDriver.click(closeSideBar);
+	}
+
+	public void openAdminTab() {
+		actionDriver.click(adminTab);
+	}
+
+	public void searchInvalidAdmin() {
+		actionDriver.enterText(usernameInput, "aaaaaaaa");
+		actionDriver.click(roleSelect);
+		actionDriver.click(role_Admin);
+		actionDriver.click(statusSelect);
+		actionDriver.click(status_Enabled);
+		actionDriver.click(searchButton2);
+	}
+
+	public boolean verifyInvalidSearch() {
+		openAdminTab();
+		searchInvalidAdmin();
+		return actionDriver.isDisplayed(noRecordFouns);
+	}
+
+	public boolean verifyDeleteAdminSuccessfully() {
+		actionDriver.click(deleteAdminButton);
+		actionDriver.click(confirmDelete);
+		return verifyInvalidSearch();
+
+	}
+
+	public void verifyAddNewAdmin(String userRole, String status, String empName, String usrName, String pwd,
+			String confirmPwd) {
+		actionDriver.click(addButton);
+		addAdminPage.addNewUser(userRole, status, empName, usrName, pwd, confirmPwd);
+
+	}
+
 }
