@@ -25,6 +25,14 @@
 			<class name="com.orangehrm.test.HomePageTest" />
 		</classes>
 	</test>
+
+	<test name="SearchEmployeeTest">
+		<parameter name="browser" value="firefox" />
+		<classes>
+			<class name="com.orangehrm.test.SearchEmployeeTest" />
+		</classes>
+	</test>
+
 </suite>
 
 

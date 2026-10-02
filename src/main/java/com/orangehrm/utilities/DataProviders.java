@@ -24,6 +24,16 @@ public class DataProviders {
 		return getSheetData("emplVerfication");
 	}
 
+	@DataProvider(name = "emplSearchDelete")
+	public static Object[][] emplSearchDelete() {
+		return getSheetData("emplSearchDelete");
+	}
+
+	@DataProvider(name = "addNewUser")
+	public static Object[][] addNewUser() {
+		return getSheetData("addNewUser");
+	}
+
 	private static Object[][] getSheetData(String sheetName) {
 		List<String[]> sheetData = ExcelReaderUtility.getSheetData(FILE_PATH,
 				sheetName);
