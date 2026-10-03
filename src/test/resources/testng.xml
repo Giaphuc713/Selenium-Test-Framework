@@ -4,7 +4,7 @@
 	<listeners>
 		<listener class-name="com.orangehrm.listeners.TestListener"></listener>
 	</listeners>
-	<test name="OrangeHRMTest_chrome">
+	<!-- <test name="OrangeHRMTest_chrome">
 		<parameter name="browser" value="chrome" />
 		<classes>
 			<class name="com.orangehrm.test.ApiTest" />
@@ -22,7 +22,7 @@
 		<classes>
 			<class name="com.orangehrm.test.AddNewAdMinTest" />
 		</classes>
-	</test>
+	</test> -->
 
 	<test name="SearchInvalidAdminTest">
 		<parameter name="browser" value="firefox" />

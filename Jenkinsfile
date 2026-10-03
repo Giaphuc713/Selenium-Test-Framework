@@ -1,6 +1,10 @@
 pipeline {
     agent any  
 
+    environment {
+        SLACK_URL_UPLOAD = credentials('SLACK_URL_UPLOAD')
+    }
+
     triggers {
         // Runs daily at 12:00 PM (noon) / 24:00 (midnight: 0 0 * * *)
         // H 12 * * * avoids load spikes by hashing the exact minute around 12 PM
@@ -47,27 +51,25 @@ pipeline {
             junit 'target/surefire-reports/*.xml'
             
             // Gửi thông báo đến Slack Webhook bằng curl theo định dạng payload urlencode
-            withCredentials([string(credentialsId: 'SLACK_URL_UPLOAD', variable: 'SLACK_URL_UPLOAD')]) {
-                sh """
-                    curl -X POST --data-urlencode 'payload={
-                        "text": "*[Topic] PROD*",
-                        "attachments": [
-                            {
-                                "color": "${currentBuild.currentResult == 'SUCCESS' ? '#00B050' : '#FF0000'}",
-                                "blocks": [
-                                    {
-                                        "type": "section",
-                                        "text": {
-                                            "type": "mrkdwn",
-                                            "text": "*Regression Test Results*\\n*Job:* ${env.JOB_NAME} #${env.BUILD_NUMBER}\\n*Status:* ${currentBuild.currentResult}\\n*URL:* ${env.BUILD_URL}"
-                                        }
+            sh """
+                curl -X POST --data-urlencode 'payload={
+                    "text": "*[Topic] PROD*",
+                    "attachments": [
+                        {
+                            "color": "${currentBuild.currentResult == 'SUCCESS' ? '#00B050' : '#FF0000'}",
+                            "blocks": [
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "*Regression Test Results*\\n*Job:* ${env.JOB_NAME} #${env.BUILD_NUMBER}\\n*Status:* ${currentBuild.currentResult}\\n*URL:* ${env.BUILD_URL}"
                                     }
-                                ]
-                            }
-                        ]
-                    }' "\${SLACK_URL_UPLOAD}"
-                """
-            }
+                                }
+                            ]
+                        }
+                    ]
+                }' "\${SLACK_URL_UPLOAD}"
+            """
         }
     }
 }
