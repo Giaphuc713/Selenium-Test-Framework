@@ -1,6 +1,12 @@
 pipeline {
     agent any  
 
+    triggers {
+        // Runs daily at 12:00 PM (noon) / 24:00 (midnight: 0 0 * * *)
+        // H 12 * * * avoids load spikes by hashing the exact minute around 12 PM
+        cron('H 12 * * *')
+    }
+
     tools {
         maven 'Apache Maven 3.3.9' 
     }

@@ -11,7 +11,7 @@
 		</classes>
 	</test>
 	<test name="OrangeHRMTest_edge">
-		<parameter name="browser" value="chrome" />
+		<parameter name="browser" value="edge" />
 		<classes>
 			<class name="com.orangehrm.test.DummyClass" />
 			<class name="com.orangehrm.test.DummyClass2" />
@@ -20,16 +20,14 @@
 	<test name="OrangeHRMTest_firefox">
 		<parameter name="browser" value="firefox" />
 		<classes>
-			<class name="com.orangehrm.test.DBVerificationTest" />
-			<class name="com.orangehrm.test.LoginPageTest" />
-			<class name="com.orangehrm.test.HomePageTest" />
+			<class name="com.orangehrm.test.AddNewAdMinTest" />
 		</classes>
 	</test>
 
-	<test name="SearchEmployeeTest">
+	<test name="SearchInvalidAdminTest">
 		<parameter name="browser" value="firefox" />
 		<classes>
-			<class name="com.orangehrm.test.SearchEmployeeTest" />
+			<class name="com.orangehrm.test.SearchInvalidAdminTest" />
 		</classes>
 	</test>
 

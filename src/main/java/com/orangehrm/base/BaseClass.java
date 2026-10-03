@@ -112,15 +112,15 @@ public class BaseClass {
 			try {
 				if (browser.equalsIgnoreCase("chrome")) {
 					ChromeOptions options = new ChromeOptions();
-					options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
+					options.addArguments("--disable-gpu", "--window-size=1920,1080");
 					driver.set(new RemoteWebDriver(new URL(gridURL), options));
 				} else if (browser.equalsIgnoreCase("firefox")) {
 					FirefoxOptions options = new FirefoxOptions();
-					options.addArguments("-headless");
+					// options.addArguments("-headless");
 					driver.set(new RemoteWebDriver(new URL(gridURL), options));
 				} else if (browser.equalsIgnoreCase("edge")) {
 					EdgeOptions options = new EdgeOptions();
-					options.addArguments("--headless=new", "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage");
+					options.addArguments("--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage");
 					driver.set(new RemoteWebDriver(new URL(gridURL), options));
 				} else {
 					throw new IllegalArgumentException("Browser Not Supported: " + browser);
@@ -208,8 +208,8 @@ public class BaseClass {
 		 */
 
 		if (seleniumGrid) {
-			logger.info("Navigating to URL: " + prop.getProperty("url_grid"));
-			getDriver().get(prop.getProperty("url_grid"));
+			logger.info("Navigating to URL: " + prop.getProperty("url_base"));
+			getDriver().get(prop.getProperty("url_base"));
 		} else {
 			logger.info("Navigating to URL: " + prop.getProperty("url_base"));
 			getDriver().get(prop.getProperty("url_base"));
