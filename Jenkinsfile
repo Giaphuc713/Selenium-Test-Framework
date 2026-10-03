@@ -2,7 +2,7 @@ pipeline {
     agent any  
 
     environment {
-        SLACK_URL_UPLOAD = credentials('SLACK_URL_UPLOAD')
+        SLACK_URL_UPLOAD = "${env.SLACK_URL_UPLOAD}"
     }
 
     triggers {
@@ -47,10 +47,9 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/src/test/resources/ExtentReport/*.html', fingerprint: true
-            junit 'target/surefire-reports/*.xml'
+            archiveArtifacts artifacts: '**/src/test/resources/ExtentReport/*.html', fingerprint: true, allowEmptyArchive: true
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
             
-            // Gửi thông báo đến Slack Webhook bằng curl theo định dạng payload urlencode
             sh """
                 curl -X POST --data-urlencode 'payload={
                     "text": "*[Topic] PROD*",
