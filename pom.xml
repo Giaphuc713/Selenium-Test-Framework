@@ -17,8 +17,22 @@
 		<maven.compiler.release>17</maven.compiler.release>
 	</properties>
 
-	<dependencies>
+	<repositories>
+		<!-- JitPack: serves GitHub-hosted libraries like net.rcarz:jira-client -->
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+	</repositories>
 
+	<dependencies>
+		<!-- https://github.com/rcarz/jira-client (served via JitPack) -->
+		<dependency>
+			<groupId>com.github.rcarz</groupId>
+			<artifactId>jira-client</artifactId>
+			<version>master-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<!--
 		https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
 		<dependency>
@@ -92,9 +106,9 @@
 			<artifactId>rest-assured</artifactId>
 			<version>5.5.0</version>
 		</dependency>
-
 		
-
+		
+	
 
 	</dependencies>
 

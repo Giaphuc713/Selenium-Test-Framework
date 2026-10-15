@@ -25,9 +25,9 @@
 	</test> -->
 
 	<test name="SearchInvalidAdminTest">
-		<parameter name="browser" value="firefox" />
+		<parameter name="browser" value="chrome" />
 		<classes>
-			<class name="com.orangehrm.test.SearchInvalidAdminTest" />
+			<class name="com.orangehrm.test.LoginPageTest" />
 		</classes>
 	</test>
 
