@@ -1,51 +1,36 @@
 pipeline {
     agent any  
 
-    tools {
-        maven 'maven-3.9.9' 
+    environment {
+        SLACK_URL_UPLOAD = "${env.SLACK_URL_UPLOAD}"
     }
 
-    environment {
-        COMPOSE_PATH = "${WORKSPACE}/docker" // 🔁 Adjust if compose file is elsewhere
-        SELENIUM_GRID = "true"
+    triggers {
+        // Runs daily at 12:00 PM (noon) / 24:00 (midnight: 0 0 * * *)
+        // H 12 * * * avoids load spikes by hashing the exact minute around 12 PM
+        cron('H 12 * * *')
+    }
+
+    tools {
+        maven 'Apache Maven 3.3.9' 
     }
 
     stages {
-        stage('Start Selenium Grid via Docker Compose') {
-            steps {
-                script {
-                    echo "Starting Selenium Grid with Docker Compose..."
-                    bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml up -d"
-                    echo "Waiting for Selenium Grid to be ready..."
-                    sleep 30 // Add a wait if needed
-                }
-            }
-        }
-
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/hverma22/Selenium-Test-Framework.git'
+                git branch: 'main', url: 'https://github.com/Giaphuc713/Selenium-Test-Framework.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'mvn clean install -DseleniumGrid=true'
+                sh 'mvn clean test-compile'
             }
         }
 
         stage('Test') {
             steps {
-                bat "mvn clean test -DseleniumGrid=true"
-            }
-        }
-
-        stage('Stop Selenium Grid') {
-            steps {
-                script {
-                    echo "Stopping Selenium Grid..."
-                    bat "docker compose -f ${COMPOSE_PATH}\\docker-compose.yml down"
-                }
+                sh 'mvn test'
             }
         }
 
@@ -53,7 +38,7 @@ pipeline {
             steps {
                 publishHTML(target: [
                     reportDir: 'src/test/resources/ExtentReport',  
-                    reportFiles: 'SparkReport.html',  
+                    reportFiles: 'ExtentReport.html',  
                     reportName: 'Extent Report'
                 ])
             }
@@ -62,57 +47,29 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/src/test/resources/ExtentReport/*.html', fingerprint: true
-            junit 'target/surefire-reports/*.xml'
-        }
-
-        success {
-            emailext (
-                to: 'hitendraverma22@gmail.com',
-                subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <html>
-                <body>
-                <p>Hello Team,</p>
-                <p>The latest Jenkins build has completed successfully.</p>
-                <p><b>Project Name:</b> ${env.JOB_NAME}</p>
-                <p><b>Build Number:</b> #${env.BUILD_NUMBER}</p>
-                <p><b>Build Status:</b> <span style="color: green;"><b>SUCCESS</b></span></p>
-                <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                <p><b>Extent Report:</b> <a href="http://localhost:8080/job/${env.JOB_NAME}/HTML_20Extent_20Report/">Click here</a></p>
-                <p>Best regards,</p>
-                <p><b>Automation Team</b></p>
-                </body>
-                </html>
-                """,
-                mimeType: 'text/html',
-                attachLog: true
-            )
-        }
-
-        failure {
-            emailext (
-                to: 'hitendraverma22@gmail.com',
-                subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                <html>
-                <body>
-                <p>Hello Team,</p>
-                <p>The latest Jenkins build has <b style="color: red;">FAILED</b>.</p>
-                <p><b>Project Name:</b> ${env.JOB_NAME}</p>
-                <p><b>Build Number:</b> #${env.BUILD_NUMBER}</p>
-                <p><b>Build Status:</b> <span style="color: red;"><b>FAILED &#10060;</b></span></p>
-                <p><b>Build URL:</b> <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                <p><b>Please check the logs and take necessary actions.</b></p>
-                <p><b>Extent Report (if available):</b> <a href="http://localhost:8080/job/${env.JOB_NAME}/HTML_20Extent_20Report/">Click here</a></p>
-                <p>Best regards,</p>
-                <p><b>Automation Team</b></p>
-                </body>
-                </html>
-                """,
-                mimeType: 'text/html',
-                attachLog: true
-            )
+            archiveArtifacts artifacts: '**/src/test/resources/ExtentReport/*.html', fingerprint: true, allowEmptyArchive: true
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+            
+            sh """
+                curl -X POST --data-urlencode 'payload={
+                    "text": "*[Topic] PROD*",
+                    "attachments": [
+                        {
+                            "color": "${currentBuild.currentResult == 'SUCCESS' ? '#00B050' : '#FF0000'}",
+                            "blocks": [
+                                {
+                                    "type": "section",
+                                    "text": {
+                                        "type": "mrkdwn",
+                                        "text": "*Regression Test Results*\\n*Job:* ${env.JOB_NAME} #${env.BUILD_NUMBER}\\n*Status:* ${currentBuild.currentResult}\\n*URL:* ${env.BUILD_URL}"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }' "\${SLACK_URL_UPLOAD}"
+            """
         }
     }
 }
+

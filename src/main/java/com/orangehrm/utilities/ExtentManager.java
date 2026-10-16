@@ -73,7 +73,10 @@ public class ExtentManager {
 
 	// Log a step
 	public static void logStep(String logMessage) {
-		getTest().info(logMessage);
+		com.orangehrm.base.BaseClass.logger.info("[STEP] " + logMessage);
+		if (getTest() != null) {
+			getTest().info(logMessage);
+		}
 	}
 
 	// Log a step validation with screenshot

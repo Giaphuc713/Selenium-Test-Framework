@@ -13,6 +13,7 @@ import java.util.ArrayList;
 public class HomePage {
 
 	private ActionDriver actionDriver;
+	private AddAdminPage addAdminPage;
 
 	// Define locators using By class
 	private By adminTab = By.xpath("//span[text()='Admin']");
@@ -26,9 +27,20 @@ public class HomePage {
 	private By searchButton = By.xpath("//button[@type='submit']");
 	private By emplFirstAndMiddleName = By.xpath("//div[@class='oxd-table-card']/div/div[3]");
 	private By emplLastName = By.xpath("//div[@class='oxd-table-card']/div/div[4]");
-	private By listRegion = By.xpath("//ul [@id='regionSelectDropdown']");
-	private By buttonClickRegion = By.xpath("//button[@aria-label='Language']");
-	private By usaLanguageOption = By.xpath("//li//a//span[text()='USA']");
+	private By closeSideBar = By.xpath("//i[@class='oxd-icon bi-chevron-left']");
+	private By openSideBar = By.xpath("//i[@classs ='oxd-icon bi-chevron-right']");
+	private By usernameInput = By.xpath("(//input[contains(@class,'oxd-input')])[2]");
+	private By roleSelect = By.xpath("(//div[@class = 'oxd-select-wrapper'])[1]");
+	private By statusSelect = By.xpath("(//div[@class = 'oxd-select-wrapper'])[2]");
+	private By role_Admin = By.xpath("(//div[@class = 'oxd-select-text--after'])[1]");
+	private By status_Enabled = By.xpath("(//div[@class = 'oxd-select-text--after'])[2]");
+	private By searchButton2 = By.xpath("//button[@type='submit']");
+	private By noRecordFouns = By.xpath("//span[text()='No Records Found']");
+	private By deleteAdminButton = By.xpath("//i[@class='oxd-icon bi-trash']");
+	private By confirmDelete = By.xpath("//button[text() = ' Yes, Delete ']");
+	private By addButton = By.xpath("//button[text() = ' Add ']");
+	private By pimTabButton = By.xpath("//span[text() = 'PIM']");
+
 	// Initialize the ActionDriver object by passing WebDriver instance
 	/*
 	 * public HomePage(WebDriver driver) { this.actionDriver= new
@@ -70,27 +82,56 @@ public class HomePage {
 		return actionDriver.compareText(emplLastName, emplLastFromDB);
 	}
 
-	public boolean isFullRegionDisplayed(List<String> countryLists) {
-		actionDriver.clickUsingJS(buttonClickRegion);
-		List<WebElement> list = actionDriver.getCountryList(listRegion);
-		List<String> displayedRegions = new ArrayList<>();
-		for (WebElement region : list) {
-			displayedRegions.add(region.getText());
-		}
-		return countryLists.equals(displayedRegions);
-	}
-
-	public void clickUSALanguage(String value) {
-		actionDriver.clickUsingJS(usaLanguageOption);
-	}
-
 	// Method to perform logout operation
 	public void logout() {
 		actionDriver.click(userIDButton);
 		actionDriver.click(logoutButton);
 	}
 
-	public void navigateHeader() {
+	public void openSidebar() {
+		actionDriver.click(openSideBar);
+	}
+
+	public void closeSidebar() {
+		actionDriver.click(closeSideBar);
+	}
+
+	public void openAdminTab() {
+		actionDriver.click(adminTab);
+	}
+
+	public void searchInvalidAdmin(String name) {
+		actionDriver.enterText(usernameInput, name);
+		actionDriver.click(roleSelect);
+		actionDriver.click(role_Admin);
+		actionDriver.click(statusSelect);
+		actionDriver.click(status_Enabled);
+		actionDriver.click(searchButton2);
+	}
+
+	public boolean verifyInvalidSearch(String name) {
+		openAdminTab();
+		searchInvalidAdmin(name);
+		return actionDriver.isDisplayed(noRecordFouns);
+	}
+
+	public boolean verifyDeleteAdminSuccessfully(String name) {
+		actionDriver.click(deleteAdminButton);
+		actionDriver.click(confirmDelete);
+		return verifyInvalidSearch(name);
 
 	}
+
+	public void clickAdminTab() {
+		actionDriver.click(adminTab);
+	}
+
+	public void navigateToAddAdmin() {
+		actionDriver.click(addButton);
+	}
+
+	public void navigateToPimTab() {
+		actionDriver.click(pimTab);
+	}
+
 }

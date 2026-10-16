@@ -11,6 +11,8 @@ import com.orangehrm.pages.LoginPage;
 import com.orangehrm.utilities.DataProviders;
 import com.orangehrm.utilities.ExtentManager;
 
+import com.orangehrm.utilities.JiraCreateIssue;
+
 public class LoginPageTest extends BaseClass {
 
 	private LoginPage loginPage;
@@ -22,6 +24,7 @@ public class LoginPageTest extends BaseClass {
 		homePage = new HomePage(getDriver());
 	}
 
+	@JiraCreateIssue(isCreateIssue = true)
 	@Test(dataProvider = "validLoginData", dataProviderClass = DataProviders.class)
 	public void verifyValidLoginTest(String username, String password) {
 
@@ -38,6 +41,7 @@ public class LoginPageTest extends BaseClass {
 		staticWait(2);
 	}
 
+	@JiraCreateIssue(isCreateIssue = true)
 	@Test(dataProvider = "inValidLoginData", dataProviderClass = DataProviders.class)
 	public void inValidLoginTest(String username, String password) {
 		// ExtentManager.startTest("In-valid Login Test!"); --This has been implemented
@@ -45,7 +49,7 @@ public class LoginPageTest extends BaseClass {
 		System.out.println("Running testMethod2 on thread: " + Thread.currentThread().getId());
 		ExtentManager.logStep("Navigating to Login Page entering username and password");
 		loginPage.login(username, password);
-		String expectedErrorMessage = "Invalid credentials";
+		String expectedErrorMessage = "Invalid credentialssss";
 		Assert.assertTrue(loginPage.verifyErrorMessage(expectedErrorMessage), "Test Failed: Invalid error message");
 		ExtentManager.logStep("Validation Successful");
 	}

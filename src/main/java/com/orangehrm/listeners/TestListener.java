@@ -8,9 +8,11 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.annotations.ITestAnnotation;
-
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import com.orangehrm.base.BaseClass;
 import com.orangehrm.utilities.ExtentManager;
+import com.orangehrm.utilities.JiraCreateIssue;
+import com.orangehrm.utilities.JiraServiceProvider;
 import com.orangehrm.utilities.RetryAnalyzer;
 
 public class TestListener implements ITestListener, IAnnotationTransformer {
@@ -54,6 +56,25 @@ public class TestListener implements ITestListener, IAnnotationTransformer {
 					"Test End: " + testName + " - ❌ Test Failed");
 		} else {
 			ExtentManager.logFailureAPI("Test End: " + testName + " - ❌ Test Failed");
+		}
+		JiraCreateIssue jiraAnnotation = result.getMethod().getConstructorOrMethod().getMethod()
+				.getAnnotation(JiraCreateIssue.class);
+		if (jiraAnnotation != null && jiraAnnotation.isCreateIssue()) {
+			String jiraUrl = BaseClass.getProp().getProperty("url_project_jira").trim();
+			String jiraUser = BaseClass.getProp().getProperty("jira_username").trim();
+			String jiraPassword = BaseClass.getProp().getProperty("jira_password").trim();
+			String jiraProject = BaseClass.getProp().getProperty("jira_projectkey").trim();
+			JiraServiceProvider jiraServiceProvider = new JiraServiceProvider(jiraUrl, jiraUser, jiraPassword,
+					jiraProject);
+			String issueDescription = "Failure Reason from Automation Testing\n\n" + result.getThrowable().getMessage()
+					+ "\n";
+
+			issueDescription = issueDescription + ExceptionUtils.getStackTrace(result.getThrowable());
+
+			String issueSummary = result.getMethod().getConstructorOrMethod().getMethod().getName()
+
+					+ " Failed in Automation Testing";
+			jiraServiceProvider.createJiraIssue("Bug", issueSummary, issueDescription, "Automated Testing");
 		}
 	}
 

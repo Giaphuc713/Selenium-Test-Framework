@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -22,14 +23,17 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
 import org.testng.asserts.SoftAssert;
 
 import com.orangehrm.actiondriver.ActionDriver;
+import com.orangehrm.listeners.TestListener;
 import com.orangehrm.utilities.ExtentManager;
 import com.orangehrm.utilities.LoggerManager;
 
+@Listeners(TestListener.class)
 public class BaseClass {
 
 	protected static Properties prop;
@@ -63,6 +67,12 @@ public class BaseClass {
 	@BeforeMethod
 	@Parameters("browser")
 	public synchronized void setup(@Optional("chrome") String browser) throws IOException {
+		if (prop == null) {
+			loadConfig();
+		}
+		if (browser == null || browser.trim().isEmpty()) {
+			browser = prop.getProperty("browser", "chrome");
+		}
 		System.out.println("Setting up WebDriver for:" + this.getClass().getSimpleName());
 		launchBrowser(browser);
 		configureBrowser();
@@ -197,8 +207,10 @@ public class BaseClass {
 		 */
 
 		if (seleniumGrid) {
+			logger.info("Navigating to URL: " + prop.getProperty("url_base"));
 			getDriver().get(prop.getProperty("url_base"));
 		} else {
+			logger.info("Navigating to URL: " + prop.getProperty("url_base"));
 			getDriver().get(prop.getProperty("url_base"));
 		}
 	}
