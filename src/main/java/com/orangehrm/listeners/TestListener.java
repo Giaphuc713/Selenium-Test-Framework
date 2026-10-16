@@ -1,4 +1,5 @@
 package com.orangehrm.listeners;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
@@ -48,10 +49,10 @@ public class TestListener implements ITestListener, IAnnotationTransformer {
 		String testName = result.getMethod().getMethodName();
 		String failureMessage = result.getThrowable().getMessage();
 		ExtentManager.logStep(failureMessage);
-		if(!result.getTestClass().getName().toLowerCase().contains("api")) {
-			ExtentManager.logFailure(BaseClass.getDriver(), "Test Failed!", "Test End: " + testName + " - ❌ Test Failed");
-		}
-		else {
+		if (!result.getTestClass().getName().toLowerCase().contains("api")) {
+			ExtentManager.logFailure(BaseClass.getDriver(), "Test Failed!",
+					"Test End: " + testName + " - ❌ Test Failed");
+		} else {
 			ExtentManager.logFailureAPI("Test End: " + testName + " - ❌ Test Failed");
 		}
 	}

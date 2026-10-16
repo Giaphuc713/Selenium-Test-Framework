@@ -10,27 +10,43 @@ import com.orangehrm.pages.LoginPage;
 import com.orangehrm.utilities.DataProviders;
 import com.orangehrm.utilities.ExtentManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HomePageTest extends BaseClass {
-	
+
 	private LoginPage loginPage;
 	private HomePage homePage;
-	
+
 	@BeforeMethod
 	public void setupPages() {
 		loginPage = new LoginPage(getDriver());
-		homePage  = new HomePage(getDriver());
+		homePage = new HomePage(getDriver());
 	}
-	
-	@Test(dataProvider="validLoginData", dataProviderClass = DataProviders.class)
+
+	@Test(dataProvider = "validLoginData", dataProviderClass = DataProviders.class)
 	public void verifyOrangeHRMLogo(String username, String password) {
-		//ExtentManager.startTest("Home Page Verify Logo Test"); --This has been implemented in TestListener
+		// ExtentManager.startTest("Home Page Verify Logo Test"); --This has been
+		// implemented in TestListener
 		ExtentManager.logStep("Navigating to Login Page entering username and password");
 		loginPage.login(username, password);
 		ExtentManager.logStep("Verifying Logo is visible or not");
-		Assert.assertTrue(homePage.verifyOrangeHRMlogo(),"Logo is not visible");
+		Assert.assertTrue(homePage.verifyOrangeHRMlogo(), "Logo is not visible");
 		ExtentManager.logStep("Validation Successful");
 		homePage.logout();
 		ExtentManager.logStep("Logged out Successfully!");
+	}
+
+	@Test()
+	public void verifyLanguageOptions() {
+		List<String> countryList = new ArrayList<>();
+		countryList.add("SELECT REGION");
+		countryList.add("Global");
+		countryList.add("USA");
+		countryList.add("Seychelles");
+		countryList.add("GCC");
+		countryList.add("Caribbean");
+		Assert.assertTrue(homePage.isFullRegionDisplayed(countryList));
 	}
 
 }

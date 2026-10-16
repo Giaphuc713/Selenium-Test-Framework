@@ -1,63 +1,55 @@
 package com.orangehrm.test;
 
-import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
+
+import com.aventstack.extentreports.util.Assert;
 import com.orangehrm.utilities.ApiUtility;
 import com.orangehrm.utilities.ExtentManager;
-import com.orangehrm.utilities.RetryAnalyzer;
+import org.testng.annotations.BeforeClass;
 
 import io.restassured.response.Response;
 
 public class ApiTest {
 
+	// ─────────────────────────────────────────────────────────────────
+	// @BeforeClass: chỉ login và lưu token — KHÔNG dùng ExtentManager
+	// (ExtentTest chưa được khởi tạo ở thời điểm @BeforeClass chạy)
+	// ─────────────────────────────────────────────────────────────────
+	@BeforeClass
+	public void loginOnce() {
+		Response response = ApiUtility.sendPostRequest(
+				"https://dummyjson.com/auth/login",
+				"{\"username\":\"emilys\",\"password\":\"emilyspass\"}");
+
+		// Lưu token vào ApiUtility.ThreadLocal để các @Test sau tái sử dụng
+		ApiUtility.saveAccessToken(ApiUtility.getJsonValue(response, "accessToken"));
+		ApiUtility.saveRefreshToken(ApiUtility.getJsonValue(response, "refreshToken"));
+	}
+
 	@Test
-	public void verifyGetUserAPI() {
-		
+	public void getCurrentAuthUser() {
 		SoftAssert softAssert = new SoftAssert();
-
-		// Step1: Define API Endpoint
-		String endPoint = "https://jsonplaceholder.typicode.com/users/1";
-		ExtentManager.logStep("API Endpoint: " + endPoint);
-
-		// Step2: Send GET Request
-		ExtentManager.logStep("Sending GET Request to the API");
-		Response response = ApiUtility.sendGetRequest(endPoint);
-
-		// Step3: validate status code
-		ExtentManager.logStep("Validating API Response status code");
+		Response response = ApiUtility.sendGetRequestWithAuth("https://dummyjson.com/auth/me",
+				ApiUtility.getAccessToken());
+		ExtentManager.logStep("getCurrentUser");
+		// System.out.println(response.getBody().asPrettyString());
+		// Validate status code valid
 		boolean isStatusCodeValid = ApiUtility.validateStatusCode(response, 200);
-
-		softAssert.assertTrue(isStatusCodeValid, "Status code is not as Epxected");
-
 		if (isStatusCodeValid) {
-			ExtentManager.logStepValidationForAPI("Status Code Validation Passed!");
+			ExtentManager.logStepValidationForAPI("Status Code 200 - OK ✔");
 		} else {
-			ExtentManager.logFailureAPI("Status Code Validation Failed!");
+			ExtentManager.logFailureAPI("Status Code Validation Failed! Actual: " + response.getStatusCode());
 		}
-
-		// Step4: validate user name
-		ExtentManager.logStep("Validating response body for username");
-		String userName = ApiUtility.getJsonValue(response, "username");
-		boolean isUserNameValid = "Bret".equals(userName);
-		softAssert.assertTrue(isUserNameValid, "Username is not valid");
-		if (isUserNameValid) {
-			ExtentManager.logStepValidationForAPI("Username Validation Passed!");
+		softAssert.assertTrue(isStatusCodeValid, "Status code is invalid");
+		String username = ApiUtility.getJsonValue(response, "username");
+		boolean isUsernameValid = "emilyssss".equals(username);
+		if (isUsernameValid) {
+			ExtentManager.logStepValidationForAPI("Username Validation Passed! [" + username + "] ✔");
 		} else {
-			ExtentManager.logFailureAPI("Username Validation Failed!");
+			ExtentManager.logFailureAPI("Username Validation Failed! Expected: emilys | Actual: " + username);
 		}
-
-		// Step4: validate email
-		ExtentManager.logStep("Validating response body for email");
-		String userEmail = ApiUtility.getJsonValue(response, "email");
-		boolean isEmailValid = "Sincere@april.biz".equals(userEmail);
-		softAssert.assertTrue(isEmailValid, "Email is not valid");
-		if (isEmailValid) {
-			ExtentManager.logStepValidationForAPI("Email Validation Passed!");
-		} else {
-			ExtentManager.logFailureAPI("Email Validation Failed!");
-		}
-		
+		softAssert.assertTrue(isUsernameValid, "Username is invalid");
 		softAssert.assertAll();
 
 	}
