@@ -111,7 +111,7 @@ public class BaseClass {
             try {
                 if (browser.equalsIgnoreCase("chrome")) {
                     ChromeOptions options = new ChromeOptions();
-                    // options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
+                    // options.addArguments("--disable-gpu", "--window-size=1920,1080");
                     driver.set(new RemoteWebDriver(new URL(gridURL), options));
                 } else if (browser.equalsIgnoreCase("firefox")) {
                     FirefoxOptions options = new FirefoxOptions();
