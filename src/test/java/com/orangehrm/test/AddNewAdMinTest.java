@@ -16,7 +16,7 @@ public class AddNewAdMinTest extends BaseClass {
     private HomePage homePage;
     private AddAdminPage addAdminPage;
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setupAddAdminTest() {
         loginPage = new LoginPage(getDriver());
         homePage = new HomePage(getDriver());
@@ -26,7 +26,7 @@ public class AddNewAdMinTest extends BaseClass {
         Assert.assertTrue(homePage.isAdminTabVisible(), "Admin navigation should be available after login");
     }
 
-    @Test
+    @Test(groups = {"regression"})
     public void testAddOneEnabledAdmin() {
         String employeeName = "John Michael Smith";
         String username = createUniqueUsername("john.smith");
@@ -45,6 +45,7 @@ public class AddNewAdMinTest extends BaseClass {
         Assert.assertTrue(addAdminPage.verifyAdminInUserList(username),
                 "Exactly one matching user should appear with Admin role and Enabled status");
     }
+
 
     private String createUniqueUsername(String seed) {
         String normalizedSeed = seed.replaceAll("[^A-Za-z0-9_]", "_");

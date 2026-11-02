@@ -15,7 +15,17 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.release>17</maven.compiler.release>
+		<testng.suiteXmlFile>src/test/resources/testng.xml</testng.suiteXmlFile>
 	</properties>
+
+	<profiles>
+		<profile>
+			<id>regression</id>
+			<properties>
+				<testng.suiteXmlFile>src/test/resources/regression.xml</testng.suiteXmlFile>
+			</properties>
+		</profile>
+	</profiles>
 
 	<repositories>
 		<!-- JitPack: serves GitHub-hosted libraries like net.rcarz:jira-client -->
@@ -137,8 +147,7 @@
 					<version>3.3.0</version>
 					<configuration>
 						<suiteXmlFiles>
-							<!-- Specify the location of your testng.xml file -->
-							<suiteXmlFile>src/test/resources/testng.xml</suiteXmlFile>
+							<suiteXmlFile>${testng.suiteXmlFile}</suiteXmlFile>
 						</suiteXmlFiles>
 					</configuration>
 				</plugin>

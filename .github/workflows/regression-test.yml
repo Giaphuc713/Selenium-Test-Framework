@@ -1,0 +1,53 @@
+name: Regression Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 20 * * *"
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      selenium:
+        image: selenium/standalone-chrome:latest
+        ports:
+          - 4444:4444
+        options: >-
+          --shm-size=2g
+          --health-cmd "curl -f http://localhost:4444/status || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Point tests to the Selenium service
+        run: sed -i 's|^gridURL=.*|gridURL=http://localhost:4444/wd/hub|' src/main/resources/config.properties
+
+      - name: Run regression tests
+        run: mvn --batch-mode --no-transfer-progress -Pregression test
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-test-reports
+          path: |
+            target/surefire-reports/
+            src/test/resources/ExtentReport/ExtentReport.html
+          if-no-files-found: warn
+          retention-days: 14

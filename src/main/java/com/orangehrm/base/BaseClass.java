@@ -50,7 +50,7 @@ public class BaseClass {
         return softAssert.get();
     }
 
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     public void loadConfig() throws IOException {
         // Load the configuration file
         prop = new Properties();
@@ -63,7 +63,7 @@ public class BaseClass {
         // ExtentManager.getReporter(); --This has been implemented in TestListener
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     @Parameters("browser")
     public synchronized void setup(@Optional("chrome") String browser) throws IOException {
         if (prop == null) {
