@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "projectRoot": "D:\\automation-test",
+  "baseUrl": "https://opensource-demo.orangehrmlive.com/web/index.php",
+  "framework": "selenium-java-maven",
+  "runCommand": {
+    "command": "mvn",
+    "args": [
+      "-Dtest=AddNewAdMinTest",
+      "test"
+    ]
+  },
+  "configFile": "pom.xml",
+  "tests": [
+    {
+      "file": "d:\\automation-test\\src\\test\\java\\com\\orangehrm\\test\\AddNewAdMinTest.java",
+      "framework": "selenium-java-maven",
+      "createdAt": "2026-11-01T13:51:12.422Z",
+      "specFile": "test-plans/orangehrm-add-admin-test-plan.md"
+    }
+  ],
+  "updatedAt": "2026-11-01T13:51:12.423Z"
+}

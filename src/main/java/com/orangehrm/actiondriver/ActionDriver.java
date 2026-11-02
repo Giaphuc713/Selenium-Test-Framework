@@ -65,7 +65,8 @@ public class ActionDriver {
             WebElement element = driver.findElement(by);
             element.clear();
             element.sendKeys(value);
-            logger.info("Entered text on " + getElementDescription(by) + "-->" + value);
+            String loggedValue = "password".equalsIgnoreCase(element.getAttribute("type")) ? "[REDACTED]" : value;
+            logger.info("Entered text on " + getElementDescription(by) + "-->" + loggedValue);
         } catch (Exception e) {
             applyBorder(by, "red");
             logger.error("Unable to enter the value:" + e.getMessage());

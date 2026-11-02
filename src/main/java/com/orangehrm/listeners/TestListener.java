@@ -34,55 +34,65 @@ public class TestListener implements ITestListener, IAnnotationTransformer {
 	// Triggered when a Test succeeds
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		String testName = result.getMethod().getMethodName();
+		try {
+			String testName = result.getMethod().getMethodName();
 
-		if (!result.getTestClass().getName().toLowerCase().contains("api")) {
-			ExtentManager.logStepWithScreenshot(BaseClass.getDriver(), "Test Passed Successfully!",
-					"Test End: " + testName + " - ✔ Test Passed");
-		} else {
-			ExtentManager.logStepValidationForAPI("Test End: " + testName + " - ✔ Test Passed");
+			if (!result.getTestClass().getName().toLowerCase().contains("api")) {
+				ExtentManager.logStepWithScreenshot(BaseClass.getDriver(), "Test Passed Successfully!",
+						"Test End: " + testName + " - ✔ Test Passed");
+			} else {
+				ExtentManager.logStepValidationForAPI("Test End: " + testName + " - ✔ Test Passed");
+			}
+		} finally {
+			ExtentManager.clearTest();
 		}
-
 	}
 
 	// Triggered when a Test Fails
 	@Override
 	public void onTestFailure(ITestResult result) {
-		String testName = result.getMethod().getMethodName();
-		String failureMessage = result.getThrowable().getMessage();
-		ExtentManager.logStep(failureMessage);
-		if (!result.getTestClass().getName().toLowerCase().contains("api")) {
-			ExtentManager.logFailure(BaseClass.getDriver(), "Test Failed!",
-					"Test End: " + testName + " - ❌ Test Failed");
-		} else {
-			ExtentManager.logFailureAPI("Test End: " + testName + " - ❌ Test Failed");
-		}
-		JiraCreateIssue jiraAnnotation = result.getMethod().getConstructorOrMethod().getMethod()
-				.getAnnotation(JiraCreateIssue.class);
-		if (jiraAnnotation != null && jiraAnnotation.isCreateIssue()) {
-			String jiraUrl = BaseClass.getProp().getProperty("url_project_jira").trim();
-			String jiraUser = BaseClass.getProp().getProperty("jira_username").trim();
-			String jiraPassword = BaseClass.getProp().getProperty("jira_password").trim();
-			String jiraProject = BaseClass.getProp().getProperty("jira_projectkey").trim();
-			JiraServiceProvider jiraServiceProvider = new JiraServiceProvider(jiraUrl, jiraUser, jiraPassword,
-					jiraProject);
-			String issueDescription = "Failure Reason from Automation Testing\n\n" + result.getThrowable().getMessage()
-					+ "\n";
+		try {
+			String testName = result.getMethod().getMethodName();
+			String failureMessage = result.getThrowable().getMessage();
+			ExtentManager.logStep(failureMessage);
+			if (!result.getTestClass().getName().toLowerCase().contains("api")) {
+				ExtentManager.logFailure(BaseClass.getDriver(), "Test Failed!",
+						"Test End: " + testName + " - ❌ Test Failed");
+			} else {
+				ExtentManager.logFailureAPI("Test End: " + testName + " - ❌ Test Failed");
+			}
+			JiraCreateIssue jiraAnnotation = result.getMethod().getConstructorOrMethod().getMethod()
+					.getAnnotation(JiraCreateIssue.class);
+			if (jiraAnnotation != null && jiraAnnotation.isCreateIssue()) {
+				String jiraUrl = BaseClass.getProp().getProperty("url_project_jira").trim();
+				String jiraUser = BaseClass.getProp().getProperty("jira_username").trim();
+				String jiraPassword = BaseClass.getProp().getProperty("jira_password").trim();
+				String jiraProject = BaseClass.getProp().getProperty("jira_projectkey").trim();
+				JiraServiceProvider jiraServiceProvider = new JiraServiceProvider(jiraUrl, jiraUser, jiraPassword,
+						jiraProject);
+				String issueDescription = "Failure Reason from Automation Testing\n\n"
+						+ result.getThrowable().getMessage() + "\n";
 
-			issueDescription = issueDescription + ExceptionUtils.getStackTrace(result.getThrowable());
+				issueDescription = issueDescription + ExceptionUtils.getStackTrace(result.getThrowable());
 
-			String issueSummary = result.getMethod().getConstructorOrMethod().getMethod().getName()
-
-					+ " Failed in Automation Testing";
-			jiraServiceProvider.createJiraIssue("Bug", issueSummary, issueDescription, "Automated Testing");
+				String issueSummary = result.getMethod().getConstructorOrMethod().getMethod().getName()
+						+ " Failed in Automation Testing";
+				jiraServiceProvider.createJiraIssue("Bug", issueSummary, issueDescription, "Automated Testing");
+			}
+		} finally {
+			ExtentManager.clearTest();
 		}
 	}
 
 	// Triggered when a Test skips
 	@Override
 	public void onTestSkipped(ITestResult result) {
-		String testName = result.getMethod().getMethodName();
-		ExtentManager.logSkip("Test Skipped " + testName);
+		try {
+			String testName = result.getMethod().getMethodName();
+			ExtentManager.logSkip("Test Skipped " + testName);
+		} finally {
+			ExtentManager.clearTest();
+		}
 	}
 
 	// Triggered when a suite Starts
